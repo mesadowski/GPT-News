@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Welcome to News GPT-style{% endblock %}</h1>
+    <h1>{% block title %} Welcome to GPT Entertainment News!{% endblock %}</h1>
+    <h4><i>Where we shamelessly plug our products using the latest celebrity and entertainment news</i></h4>
     {% for post in posts %}
         <a href="{{ url_for('post', post_id=post[0]) }}">
-            <h2>{{ post[2] }}</h2>
+            <h3>{{ post[2] }}</h3>
+            <p>{{ post[4] }}</p>
         </a>
-        <span class="badge badge-primary">{{ post[1] }}</span>
+        <span class="badge badge-secondary">{{ post[1] }}</span>
         <hr>
     {% endfor %}
 {% endblock %}
