@@ -6,13 +6,7 @@ from datetime import datetime,timedelta
 import feedparser
 import openai   
 
-def get_main_text(j, p):
-    
-    entry = NewsFeed.entries[j]
-    link = entry['link']
-    #summary = entry['summary']
-    
-    print(entry['link'])
+def get_main_text(j, p,link):
     
     prompt_text = "Read and briefly summarize the news story at this link: {}. \
         and use it to explain why one should want to buy a product: the {}. Make it funny and brief.".format(link, p)
@@ -26,7 +20,7 @@ def get_main_text(j, p):
       max_tokens=200
     )
 
-    return response.choices[0].text, link
+    return response.choices[0].text
 
 def get_title(p,prior_convo):
     # Note: you need to feed back the prior output so that the API has this as context
@@ -44,10 +38,16 @@ def get_title(p,prior_convo):
 
 def create_posts():
     
+    NewsFeed = feedparser.parse('https://www.etonline.com/news/rss')
+    num_entries = len(NewsFeed.entries)
+    print('number of news stories = ',num_entries)
     posts = []
     for i in range(0,NUM_POSTS):
         prod = products [random.randint(0,len(products)-1)]
-        text,link = get_main_text(i,prod)
+        entry = NewsFeed.entries[i]
+        link = entry['link']
+        print(entry['link'])
+        text = get_main_text(i,prod,link)
         title = get_title(prod,text)
         summary = text[:300]+'.....'
         posts.append([i,prod,title,text,summary,link])
@@ -55,17 +55,13 @@ def create_posts():
         print('last run = ',last_run)
     return posts, last_run
 
-products = ['Ronco Veg-o-Matic', 'K-tel Fishin Magician', 'Ginsu Knife', 'Snuggie Blanket', 'Ronco Mr. Microphone','Navage Nasal Irrigation System']
+products = ['Ronco Veg-o-Matic', 'K-tel Fishin Magician', 'Snuggie Blanket', 'Ronco Mr. Microphone','Navage Nasal Irrigation System']
 
 NUM_POSTS = 5
 
 random.seed(9876)
 
-openai.api_key ='<YOURKEYGOESHERE>'
-
-NewsFeed = feedparser.parse('https://www.etonline.com/news/rss')
-num_entries = len(NewsFeed.entries)
-print('number of news stories = ',num_entries)
+openai.api_key = '<YOURKEYGOESHERE>'
 
 all_posts, last_run = create_posts()
 
